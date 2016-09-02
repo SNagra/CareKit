@@ -146,7 +146,7 @@ extension RootViewController: OCKSymptomTrackerViewControllerDelegate {
 
 extension RootViewController: ORKTaskViewControllerDelegate {
     
-    /// Called with then user completes a presented `ORKTaskViewController`.
+    /// Called when the user completes a presented `ORKTaskViewController`.
     func taskViewController(taskViewController: ORKTaskViewController, didFinishWithReason reason: ORKTaskViewControllerFinishReason, error: NSError?) {
         defer {
             dismissViewControllerAnimated(true, completion: nil)
@@ -233,7 +233,7 @@ extension RootViewController: ORKTaskViewControllerDelegate {
 extension RootViewController: OCKConnectViewControllerDelegate {
     
     /// Called when the user taps a contact in the `OCKConnectViewController`.
-    func connectViewController(connectViewController: OCKConnectViewController, didSelectShareButtonForContact contact: OCKContact, presentationSourceView sourceView: UIView) {
+    func connectViewController(connectViewController: OCKConnectViewController, didSelectShareButtonForContact contact: OCKContact, presentationSourceView sourceView: UIView?) {
         let document = sampleData.generateSampleDocument()
         let activityViewController = UIActivityViewController(activityItems: [document], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = sourceView
