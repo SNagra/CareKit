@@ -412,6 +412,25 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    OCKCarePlanEvent *selectedEvent = _events[indexPath.row];
+    
+    if (_delegate &&
+        [_delegate respondsToSelector:@selector(symptomTrackerViewController:canEditRowWithAssessmentEvent:)]) {
+        return [_delegate symptomTrackerViewController:self canEditRowWithAssessmentEvent:selectedEvent];
+    } else {
+        return NO;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    OCKCarePlanEvent *selectedEvent = _events[indexPath.row];
+    
+    if (_delegate &&
+        [_delegate respondsToSelector:@selector(symptomTrackerViewController:didDeleteRowWithAssessmentEvent:)]) {
+        [_delegate symptomTrackerViewController:self didDeleteRowWithAssessmentEvent:selectedEvent];
+    }
+}
 
 #pragma mark - UITableViewDataSource
 

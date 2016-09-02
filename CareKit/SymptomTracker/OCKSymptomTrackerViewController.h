@@ -67,6 +67,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)symptomTrackerViewController:(OCKSymptomTrackerViewController *)viewController willDisplayEvents:(NSArray<NSArray<OCKCarePlanEvent*>*>*)events dateComponents:(NSDateComponents *)dateComponents;
 
+- (BOOL)symptomTrackerViewController:(OCKSymptomTrackerViewController *)viewController canEditRowWithAssessmentEvent:(OCKCarePlanEvent *)assessmentEvent;
+
+- (void)symptomTrackerViewController:(OCKSymptomTrackerViewController *)viewController didDeleteRowWithAssessmentEvent:(OCKCarePlanEvent *)assessmentEvent;
+
 @end
 
 
