@@ -412,6 +412,30 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Return YES - we will be able to delete all rows
+    OCKCarePlanEvent *selectedEvent = _events[indexPath.row];
+    
+    if (_delegate &&
+        [_delegate respondsToSelector:@selector(symptomTrackerViewController:canEditSymptomRow:)]) {
+        return [_delegate symptomTrackerViewController:self canEditSymptomRow:selectedEvent];
+    } else {
+        return NO;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Perform the real delete action here. Note: you may need to check editing style
+    //   if you do not perform delete only.
+    OCKCarePlanEvent *selectedEvent = _events[indexPath.row];
+    
+    if (_delegate &&
+        [_delegate respondsToSelector:@selector(symptomTrackerViewController:didDeleteRowWithAssessmentEvent:)]) {
+        [_delegate symptomTrackerViewController:self didDeleteRowWithAssessmentEvent:selectedEvent];
+    }
+}
 
 #pragma mark - UITableViewDataSource
 
