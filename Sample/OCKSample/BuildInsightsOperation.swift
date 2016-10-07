@@ -38,7 +38,7 @@ class BuildInsightsOperation: Operation {
     
     var backPainEvents: DailyEvents?
     
-    private(set) var insights = [OCKInsightItem.emptyInsightsMessage()]
+    fileprivate(set) var insights = [OCKInsightItem.emptyInsightsMessage()]
     
     // MARK: NSOperation
     
@@ -70,20 +70,24 @@ class BuildInsightsOperation: Operation {
         guard let medicationEvents = medicationEvents else { return nil }
         
         // Determine the start date for the previous week.
-        let calendar = Calendar.current()
+
+        let calendar = Calendar.current
+
         let now = Date()
         
-        let components = NSDateComponents()
+        var components = DateComponents()
         components.day = -7
-        let startDate = calendar.weekDatesForDate(calendar.date(byAdding: components as DateComponents, to: now, options: [])!).start
+
+        let startDate = calendar.weekDatesForDate(calendar.date(byAdding: components as DateComponents, to: now)!).start
+
         
         var totalEventCount = 0
         var completedEventCount = 0
         
         for offset in 0..<7 {
             components.day = offset
-            let dayDate = calendar.date(byAdding: components as DateComponents, to: startDate, options: [])!
-            let dayComponents = NSDateComponents(date: dayDate, calendar: calendar)
+            let dayDate = calendar.date(byAdding: components as DateComponents, to: startDate)!
+            let dayComponents = calendar.dateComponents([.year, .month, .day, .era], from: dayDate)
             let eventsForDay = medicationEvents[dayComponents]
             
             totalEventCount += eventsForDay.count
@@ -103,7 +107,8 @@ class BuildInsightsOperation: Operation {
         // Create an `OCKMessageItem` describing medical adherence.
         let percentageFormatter = NumberFormatter()
         percentageFormatter.numberStyle = .percent
-        let formattedAdherence = percentageFormatter.string(from: medicationAdherence)!
+
+        let formattedAdherence = percentageFormatter.string(from: NSNumber(value: medicationAdherence))!
 
         let insight = OCKMessageItem(title: "Medication Adherence", text: "Your medication adherence was \(formattedAdherence) last week.", tintColor: Colors.pink.color, messageType: .tip)
         
@@ -112,14 +117,15 @@ class BuildInsightsOperation: Operation {
     
     func createBackPainInsight() -> OCKInsightItem? {
         // Make sure there are events to parse.
-        guard let medicationEvents = medicationEvents, backPainEvents = backPainEvents else { return nil }
+        guard let medicationEvents = medicationEvents, let backPainEvents = backPainEvents else { return nil }
         
         // Determine the date to start pain/medication comparisons from.
-        let calendar = Calendar.current()
-        let components = NSDateComponents()
+
+        let calendar = Calendar.current
+        var components = DateComponents()
         components.day = -7
         
-        let startDate = calendar.date(byAdding: components as DateComponents, to: Date(), options: [])!
+        let startDate = calendar.date(byAdding: components as DateComponents, to: Date())!
 
         // Create formatters for the data.
         let dayOfWeekFormatter = DateFormatter()
@@ -145,11 +151,12 @@ class BuildInsightsOperation: Operation {
         for offset in 0..<7 {
             // Determine the day to components.
             components.day = offset
-            let dayDate = calendar.date(byAdding: components as DateComponents, to: startDate, options: [])!
-            let dayComponents = NSDateComponents(date: dayDate, calendar: calendar)
+
+            let dayDate = calendar.date(byAdding: components as DateComponents, to: startDate)!
+            let dayComponents = calendar.dateComponents([.year, .month, .day, .era], from: dayDate)
             
             // Store the pain result for the current day.
-            if let result = backPainEvents[dayComponents].first?.result, score = Int(result.valueString) where score > 0 {
+            if let result = backPainEvents[dayComponents].first?.result, let score = Int(result.valueString) , score > 0 {
                 painValues.append(score)
                 painLabels.append(result.valueString)
             }
@@ -160,12 +167,13 @@ class BuildInsightsOperation: Operation {
             
             // Store the medication adherance value for the current day.
             let medicationEventsForDay = medicationEvents[dayComponents]
-            if let adherence = percentageEventsCompleted(medicationEventsForDay) where adherence > 0.0 {
+            if let adherence = percentageEventsCompleted(medicationEventsForDay) , adherence > 0.0 {
                 // Scale the adherance to the same 0-10 scale as pain values.
                 let scaledAdeherence = adherence * 10.0
                 
                 medicationValues.append(scaledAdeherence)
-                medicationLabels.append(percentageFormatter.string(from: adherence)!)
+
+                medicationLabels.append(percentageFormatter.string(from: NSNumber(value: adherence))!)
             }
             else {
                 medicationValues.append(0.0)
@@ -177,8 +185,9 @@ class BuildInsightsOperation: Operation {
         }
 
         // Create a `OCKBarSeries` for each set of data.
-        let painBarSeries = OCKBarSeries(title: "Pain", values: painValues, valueLabels: painLabels, tintColor: Colors.blue.color)
-        let medicationBarSeries = OCKBarSeries(title: "Medication Adherence", values: medicationValues, valueLabels: medicationLabels, tintColor: Colors.lightBlue.color)
+
+        let painBarSeries = OCKBarSeries(title: "Pain", values: painValues as [NSNumber], valueLabels: painLabels, tintColor: Colors.blue.color)
+        let medicationBarSeries = OCKBarSeries(title: "Medication Adherence", values: medicationValues as [NSNumber], valueLabels: medicationLabels, tintColor: Colors.lightBlue.color)
 
         /*
             Add the series to a chart, specifing the scale to use for the chart
@@ -200,7 +209,8 @@ class BuildInsightsOperation: Operation {
         For a given array of `OCKCarePlanEvent`s, returns the percentage that are
         marked as completed.
     */
-    private func percentageEventsCompleted(_ events: [OCKCarePlanEvent]) -> Float? {
+
+    fileprivate func percentageEventsCompleted(_ events: [OCKCarePlanEvent]) -> Float? {
         guard !events.isEmpty else { return nil }
         
         let completedCount = events.filter({ event in

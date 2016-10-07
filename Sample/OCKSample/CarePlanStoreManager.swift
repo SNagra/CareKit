@@ -45,18 +45,18 @@ class CarePlanStoreManager: NSObject {
         return insightsBuilder.insights
     }
     
-    private let insightsBuilder: InsightsBuilder
+    fileprivate let insightsBuilder: InsightsBuilder
 
     // MARK: Initialization
     
-    private override init() {
+    fileprivate override init() {
         // Determine the file URL for the store.
         let searchPaths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
         let applicationSupportPath = searchPaths[0]
         let persistenceDirectoryURL = URL(fileURLWithPath: applicationSupportPath)
         
-        if !FileManager.default().fileExists(atPath: persistenceDirectoryURL.absoluteString!, isDirectory: nil) {
-            try! FileManager.default().createDirectory(at: persistenceDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+        if !FileManager.default.fileExists(atPath: persistenceDirectoryURL.absoluteString, isDirectory: nil) {
+            try! FileManager.default.createDirectory(at: persistenceDirectoryURL, withIntermediateDirectories: true, attributes: nil)
         }
         
         // Create the store.
@@ -81,7 +81,7 @@ class CarePlanStoreManager: NSObject {
     func updateInsights() {
         insightsBuilder.updateInsights { [weak self] completed, newInsights in
             // If new insights have been created, notifiy the delegate.
-            guard let storeManager = self, newInsights = newInsights where completed else { return }
+            guard let storeManager = self, let newInsights = newInsights , completed else { return }
             storeManager.delegate?.carePlanStoreManager(storeManager, didUpdateInsights: newInsights)
         }
     }

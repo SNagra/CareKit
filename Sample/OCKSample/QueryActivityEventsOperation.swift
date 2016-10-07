@@ -33,19 +33,19 @@ import CareKit
 class QueryActivityEventsOperation: Operation {
     // MARK: Properties
     
-    private let store: OCKCarePlanStore
+    fileprivate let store: OCKCarePlanStore
     
-    private let activityIdentifier: String
+    fileprivate let activityIdentifier: String
     
-    private let startDate: NSDateComponents
+    fileprivate let startDate: DateComponents
     
-    private let endDate: NSDateComponents
+    fileprivate let endDate: DateComponents
     
-    private(set) var dailyEvents: DailyEvents?
+    fileprivate(set) var dailyEvents: DailyEvents?
     
     // MARK: Initialization
     
-    init(store: OCKCarePlanStore, activityIdentifier: String, startDate: NSDateComponents, endDate: NSDateComponents) {
+    init(store: OCKCarePlanStore, activityIdentifier: String, startDate: DateComponents, endDate: DateComponents) {
         self.store = store
         self.activityIdentifier = activityIdentifier
         self.startDate = startDate
@@ -82,12 +82,12 @@ class QueryActivityEventsOperation: Operation {
         }
         
         // Wait for the semaphore to be signalled.
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
     }
     
     // MARK: Convenience
     
-    private func findActivity() -> OCKCarePlanActivity? {
+    fileprivate func findActivity() -> OCKCarePlanActivity? {
         /*
              Create a semaphore to wait for the asynchronous call to `activityForIdentifier`
              to complete.
@@ -109,7 +109,7 @@ class QueryActivityEventsOperation: Operation {
         }
         
         // Wait for the semaphore to be signalled.
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
         
         return activity
     }
@@ -120,17 +120,17 @@ class QueryActivityEventsOperation: Operation {
 struct DailyEvents {
     // MARK: Properties
     
-    private var mappedEvents: [NSDateComponents: [OCKCarePlanEvent]]
+    fileprivate var mappedEvents: [DateComponents: [OCKCarePlanEvent]]
     
     var allEvents: [OCKCarePlanEvent] {
-        return Array(mappedEvents.values.flatten())
+        return Array(mappedEvents.values.joined())
     }
     
-    var allDays: [NSDateComponents] {
+    var allDays: [DateComponents] {
         return Array(mappedEvents.keys)
     }
     
-    subscript(day: NSDateComponents) -> [OCKCarePlanEvent] {
+    subscript(day: DateComponents) -> [OCKCarePlanEvent] {
         get {
             if let events = mappedEvents[day] {
                 return events

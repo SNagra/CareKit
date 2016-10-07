@@ -49,7 +49,7 @@ struct Weight: Assessment, HealthSampleBuilder {
     
     func carePlanActivity() -> OCKCarePlanActivity {
         // Create a weekly schedule.
-        let startDate = NSDateComponents(year: 2016, month: 01, day: 01)
+        let startDate = DateComponents(year: 2016, month: 01, day: 01)
         let schedule = OCKCareSchedule.weeklySchedule(withStartDate: startDate as DateComponents, occurrencesOnEachDay: [1, 1, 1, 1, 1, 1, 1])
         
         // Get the localized strings to use for the assessment.
@@ -92,10 +92,10 @@ struct Weight: Assessment, HealthSampleBuilder {
     /// Builds a `HKQuantitySample` from the information in the supplied `ORKTaskResult`.
     func buildSampleWithTaskResult(_ result: ORKTaskResult) -> HKQuantitySample {
         // Get the first result for the first step of the task result.
-        guard let firstResult = result.firstResult as? ORKStepResult, stepResult = firstResult.results?.first else { fatalError("Unexepected task results") }
+        guard let firstResult = result.firstResult as? ORKStepResult, let stepResult = firstResult.results?.first else { fatalError("Unexepected task results") }
         
         // Get the numeric answer for the result.
-        guard let weightResult = stepResult as? ORKNumericQuestionResult, weightAnswer = weightResult.numericAnswer else { fatalError("Unable to determine result answer") }
+        guard let weightResult = stepResult as? ORKNumericQuestionResult, let weightAnswer = weightResult.numericAnswer else { fatalError("Unable to determine result answer") }
         
         // Create a `HKQuantitySample` for the answer.
         let quantity = HKQuantity(unit: unit, doubleValue: weightAnswer.doubleValue)

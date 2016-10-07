@@ -47,11 +47,14 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '9.0'
   s.source                = { :git => 'https://github.com/carekit-apple/carekit.git', :tag => s.version.to_s }
   s.source_files          = 'CareKit/**/*.{h,m}'
-  s.private_header_files  = [ 'CareKit/**/*Private.h', 'CareKit/**/*Internal.h' ]
+  s.private_header_files  = `./scripts/find_headers.rb --private CareKit CareKit.xcodeproj`.split("\n")
   s.resources             = [ 'CareKit/Assets.xcassets', 
                               'CareKit/Localization/*.lproj', 
                               'CareKit/CarePlan/OCKCarePlanStore.xcdatamodeld' ]
+  s.public_header_files   = `./scripts/find_headers.rb --public CareKit CareKit.xcodeproj`.split("\n")
+                              
   s.exclude_files         = [ 'docs', 'Sample', 'testing', 'DerivedData' ]
+  s.module_map            = 'CareKit/CareKit.modulemap'
   s.requires_arc          = true
   s.ios.framework         = [ 'HealthKit', 'CoreData' ]
 

@@ -33,11 +33,12 @@ import CareKit
 class InsightsBuilder {
     
     /// An array if `OCKInsightItem` to show on the Insights view.
-    private(set) var insights = [OCKInsightItem.emptyInsightsMessage()]
+    fileprivate(set) var insights = [OCKInsightItem.emptyInsightsMessage()]
     
-    private let carePlanStore: OCKCarePlanStore
+    fileprivate let carePlanStore: OCKCarePlanStore
     
-    private let updateOperationQueue = OperationQueue()
+    fileprivate let updateOperationQueue = OperationQueue()
+
     
     required init(carePlanStore: OCKCarePlanStore) {
         self.carePlanStore = carePlanStore
@@ -98,7 +99,8 @@ class InsightsBuilder {
             let newInsights = buildInsightsOperation.insights
             
             // Call the completion block on the main queue.
-            OperationQueue.main().addOperation {
+
+            OperationQueue.main.addOperation {
                 if completed {
                     completion?(true, newInsights)
                 }
@@ -124,15 +126,15 @@ class InsightsBuilder {
         ], waitUntilFinished: false)
     }
     
-    private func calculateQueryDateRange() -> (start: NSDateComponents, end: NSDateComponents) {
-        let calendar = Calendar.current()
+    fileprivate func calculateQueryDateRange() -> (start: DateComponents, end: DateComponents) {
+        let calendar = Calendar.current
         let now = Date()
         
         let currentWeekRange = calendar.weekDatesForDate(now)
         let previousWeekRange = calendar.weekDatesForDate(currentWeekRange.start.addingTimeInterval(-1))
         
-        let queryRangeStart = NSDateComponents(date: previousWeekRange.start, calendar: calendar)
-        let queryRangeEnd = NSDateComponents(date: now, calendar: calendar)
+        let queryRangeStart = calendar.dateComponents([.year, .month, .day, .era], from: previousWeekRange.start)
+        let queryRangeEnd = calendar.dateComponents([.year, .month, .day, .era], from: now)
         
         return (start: queryRangeStart, end: queryRangeEnd)
     }
