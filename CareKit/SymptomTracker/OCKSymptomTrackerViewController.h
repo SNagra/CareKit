@@ -71,6 +71,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)symptomTrackerViewController:(OCKSymptomTrackerViewController *)viewController didDeleteRowWithAssessmentEvent:(OCKCarePlanEvent *)assessmentEvent;
 
+- (void)symptomTrackerViewWillAppear:(OCKSymptomTrackerViewController *)viewController;
+
 @end
 
 

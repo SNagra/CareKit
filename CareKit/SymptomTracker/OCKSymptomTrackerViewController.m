@@ -101,6 +101,14 @@
     _tableView.sectionHeaderHeight = UITableViewAutomaticDimension;
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(symptomTrackerViewWillAppear:)]) {
+        return [_delegate symptomTrackerViewWillAppear:self];
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
